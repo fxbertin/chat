@@ -1,0 +1,7 @@
+
+<!DOCTYPE HTML>
+
+  <div id="paint" >
+  		<canvas id="myCanvas" style="height:97%"></canvas>
+	</div>
+  
