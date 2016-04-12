@@ -68,42 +68,43 @@ channel.join()
 
   let mouse = {x: 0, y: 0};
 
-  canvas.addEventListener('mousemove', function(e) {
-    mouse.x = e.pageX - this.offsetLeft;
-    mouse.y = e.pageY - this.offsetTop;
-  }, false);
-
   ctx.lineWidth = 3;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   ctx.strokeStyle = '#00CC99';
 
-  canvas.addEventListener('mousedown', function(e) {
-      //ctx.beginPath();
-      //ctx.moveTo(mouse.x, mouse.y);
+  $("#myCanvas").mousedown(function (e) {
+      var $this = $(this);
+      mouse.x = e.pageX - this.offsetLeft;
+      mouse.y = e.pageY - this.offsetTop;
+      ctx.moveTo(mouse.x, mouse.y);
+      channel.push("new_msg", {x: mouse.x, y: mouse.y, ev: "md"});
 
-      canvas.addEventListener('mousemove', onPaint, false);
-  }, false);
+      $this.mousemove(function (e) {
+        mouse.x = e.pageX - this.offsetLeft;
+        mouse.y = e.pageY - this.offsetTop;
 
-  canvas.addEventListener('mouseup', function() {
-      canvas.removeEventListener('mousemove', onPaint, false);
-  }, false);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+        channel.push("new_msg", {x: mouse.x, y: mouse.y, ev: "mv"});
+      });
 
-  let onPaint = function() {
-      channel.push("new_msg", {x: mouse.x, y: mouse.y});
-
-      //ctx.lineTo(mouse.x, mouse.y);
-      //ctx.stroke();
-  };
+      $(document).mouseup(function () {
+          $(document).unbind("mouseup");
+          $this.unbind("mousemove");
+      });
+  });
 
 
   channel.on("new_msg", payload => {
-
-    //ctx.beginPath();
     console.log(payload);
-    //ctx.moveTo(payload-1, payload-1);
-    ctx.lineTo(payload.x, payload.y);
-    ctx.stroke();
+    if (payload.ev == "md"){
+      ctx.moveTo(payload.x, payload.y);
+    } else {
+      ctx.lineTo(payload.x, payload.y);
+      ctx.stroke();
+    }
+
   });
 
 export default socket

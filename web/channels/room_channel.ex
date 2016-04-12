@@ -10,7 +10,7 @@ defmodule Chat.RoomChannel do
   end
 
   def handle_in("new_msg", msg, socket) do
-    broadcast! socket, "new_msg", %{x: msg["x"], y: msg["y"]}
+    broadcast! socket, "new_msg", %{x: msg["x"], y: msg["y"], ev: msg["ev"]}
     {:noreply, socket}
   end
 
